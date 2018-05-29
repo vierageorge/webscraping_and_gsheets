@@ -1,0 +1,4 @@
+*.pyc
+__pycache__
+.DS_Store
+sandbox_credentias.json
