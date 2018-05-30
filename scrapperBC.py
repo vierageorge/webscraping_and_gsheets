@@ -2,6 +2,11 @@ from selenium import webdriver
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.by import By
 import time, datetime
+from test import insert_row_gsheets
+from locale import *
+from locale_helper import perc_to_float, money_to_float, longnum_to_float
+
+setlocale(LC_ALL,'')
 
 wait_time = 1
 path_chromeDriver = "D:\chromedriver.exe"
@@ -21,17 +26,12 @@ for option in options:
     nombre_fondo = option.text
     rows = driver.find_elements(By.XPATH, "//div[@id='resultados']/table/tbody/tr/td")
     if len(rows)>=30:
-        dias_7 = rows[15].text
-        dias_30 = rows[16].text
-        dias_180 = rows[17].text
-        anos_corrido = rows[23].text
-        anos_ultimo = rows[24].text
-        anos_ultimos2 = rows[25].text
-        anos_ultimos3 = rows[26].text
-        valor_unidad = rows[7].text
-        valor_pesos = rows[9].text
+        [dias_7,dias_30,dias_180]  = [perc_to_float(rows[15].text), perc_to_float(rows[16].text), perc_to_float(rows[17].text)]
+        [anos_corrido, anos_ultimo, anos_ultimos2, anos_ultimos3] = [perc_to_float(rows[23].text), perc_to_float(rows[24].text), perc_to_float(rows[25].text), perc_to_float(rows[26].text)]
+        [valor_unidad, valor_pesos] = [longnum_to_float(rows[7].text), money_to_float(rows[9].text)]
         fecha_cierre = rows[29].text
-        print("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(today_str, nombre_fondo, dias_7, dias_30, dias_180, anos_corrido, anos_ultimo, anos_ultimos2, anos_ultimos3, valor_unidad, valor_pesos, fecha_cierre))
+        rowG = [today_str, nombre_fondo, dias_7, dias_30, dias_180, anos_corrido, anos_ultimo, anos_ultimos2, anos_ultimos3, valor_unidad, valor_pesos, fecha_cierre]
+        insert_row_gsheets(rowG)
     else:
         print("{} -> No tiene todos los td: Rows: {}".format(nombre_fondo, len(rows)))
 driver.quit()
